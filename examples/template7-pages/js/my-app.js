@@ -6,7 +6,7 @@ Template7.registerHelper('json_stringify', function (context) {
 // Initialize your app
 var myApp = new Framework7({
     animateNavBackIcon: true,
-    // Enable templates auto precompilation
+    // Enable templates auto pre-compilation
     precompileTemplates: true,
     // Enabled pages rendering using Template7
     template7Pages: true,
@@ -23,15 +23,15 @@ var myApp = new Framework7({
             projects: [
                 {
                     title: 'National Geographic',
-                    description: 'National Geographic, formerly The National Geographic Magazine, is the official magazine of the National Geographic Society. It has been published continuously since its first issue in 1888, nine months after the Society itself was founded.'
+                    description: 'National Geographic, formerly The National Geographic Magazine'
                 },
                 {
                     title: 'AKQA',
-                    description: 'Online video service'
+                    description: 'AKQA is a digital agency that specializes in creating digital services and products. '
                 },
                 {
                     title: 'Siteworx',
-                    description: 'Mobile operating system'
+                    description: 'Siteworx, LLC is a digital agency that specializes in experience design'
                 }
             ]
         },
@@ -49,34 +49,34 @@ var myApp = new Framework7({
         // Just plain data object that we can pass for other pages using data-contextName attribute
         cars: [
             {
-                vendor: 'Volkswagen',
-                model: 'Passat',
-                power: 152,
-                speed: 280,
-                weight: 1400,
-                color: 'black',
+                vendor: 'MVC',
+                model: 'AngularJS',
+                language: 'Javascript',
+                creator: 'Google',
+                community: 'Large and active community',
+                plugins: 'Thousands',
                 year: 2012,
-                description: ''
+                description: 'AngularJS is what HTML would have been, had it been designed for building web-apps. Declarative templates with data-binding, MVW, MVVM, MVC'
             },
             {
-                vendor: 'Skoda',
-                model: 'Superb',
-                power: 152,
-                speed: 260,
-                weight: 1600,
-                color: 'white',
-                year: 2013,
-                description: ''
+                vendor: 'MVC',
+                model: 'EmberJS',
+                language: 'Javascript',
+                creator: 'Tom Dale',
+                community: 'Medium',
+                plugins: 'Hundreds',
+                year: 2012,
+                description: 'Ember.js is an open-source JavaScript application framework, based on the model-view-controller (MVC) pattern. It allows developers to create scalable single-page web applications by incorporating common idioms and best practices into the framework.'
             },
             {
-                vendor: 'Ford',
-                model: 'Mustang',
-                power: 480,
-                speed: 320,
-                weight: 1200,
-                color: 'red',
-                year: 2014,
-                description: ''
+                vendor: 'MVC',
+                model: 'Backbone',
+                language: 'Javascript',
+                creator: 'Google',
+                community: 'Medium',
+                plugins: 'Hundreds',
+                year: 2012,
+                description: 'AngularJS is what HTML would have been, had it been designed for building web-apps. Declarative templates with data-binding, MVW, MVVM, MVC'
             },
         ],
 
