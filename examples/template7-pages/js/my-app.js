@@ -15,22 +15,22 @@ var myApp = new Framework7({
         // Will be applied for page with "projects.html" url
         'url:projects.html': {
             firstname: 'John',
-            lastname: 'Doe',
+            lastname: 'Runion',
             age: 32,
-            position: 'CEO',
-            company: 'Google',
-            interests: ['swimming', 'music', 'JavaScript', 'iMac', 'iOS apps', 'sport'],
+            position: 'Lead',
+            company: 'Outli',
+            interests: ['user experience', 'engineering', 'front end', 'UX', 'iOS apps', 'UI'],
             projects: [
                 {
-                    title: 'Google',
-                    description: 'Nice search engine'
+                    title: 'National Geographic',
+                    description: 'National Geographic, formerly The National Geographic Magazine, is the official magazine of the National Geographic Society. It has been published continuously since its first issue in 1888, nine months after the Society itself was founded.'
                 },
                 {
-                    title: 'YouTube',
+                    title: 'AKQA',
                     description: 'Online video service'
                 },
                 {
-                    title: 'Android',
+                    title: 'Siteworx',
                     description: 'Mobile operating system'
                 }
             ]
@@ -38,11 +38,11 @@ var myApp = new Framework7({
 
         // Will be applied for page with data-page="contacts"
         'page:contacts': {
-            tel: '+1 (222) 333-44-55',
-            email: 'john@doe.com',
+            tel: '+1 (571) 447-1783',
+            email: 'jvrunion@gmail.com',
             country: 'USA',
-            city: 'San Francisco',
-            zip: '12345',
+            city: 'Washington DC',
+            zip: '22315',
             street: 'Awesome st'
         },
 
@@ -82,11 +82,11 @@ var myApp = new Framework7({
 
         // Another plain data object, used in "about" link in data-contextName object 
         about: {
-            name: 'John Doe',
-            age: 32,
-            position: 'CEO',
-            company: 'Google',
-            interests: ['swimming', 'music', 'JavaScript', 'iMac', 'iOS apps', 'sport']
+            name: 'John Runion',
+            age: 39,
+            position: 'LEAD',
+            company: 'MERCURY',
+            interests: ['coding', 'design', 'UX', 'UI', 'iOS apps', 'IA']
         }
     }
 });
@@ -97,5 +97,5 @@ var $$ = Dom7;
 // Add main View
 var mainView = myApp.addView('.view-main', {
     // Enable dynamic Navbar
-    dynamicNavbar: true,
+    dynamicNavbar: true
 });
