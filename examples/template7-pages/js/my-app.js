@@ -38,7 +38,7 @@ var myApp = new Framework7({
 
         // Will be applied for page with data-page="contacts"
         'page:contacts': {
-            tel: '+1 (571) 447-1783',
+            tel: '(571) 447-1783',
             email: 'jvrunion@gmail.com',
             country: 'USA',
             city: 'Washington DC',
@@ -84,7 +84,7 @@ var myApp = new Framework7({
         about: {
             name: 'John Runion',
             age: 39,
-            position: 'LEAD',
+            position: 'Principle',
             company: 'MERCURY',
             interests: ['coding', 'design', 'UX', 'UI', 'iOS apps', 'IA']
         }

@@ -10,8 +10,9 @@
  * 
  * Licensed under MIT
  * 
- * Released on: July 18, 2015
+ * Released on: September 11, 2015
  */
+
 (function () {
 
     'use strict';
@@ -192,7 +193,13 @@
             };
             var i;
         
+            // Params
             params = params || {};
+        
+            // Disable dynamic navbar for material theme
+            if (params.dynamicNavbar && app.params.material) params.dynamicNavbar = false;
+        
+            // Extend params with defaults
             for (var def in defaults) {
                 if (typeof params[def] === 'undefined') {
                     params[def] = defaults[def];
@@ -1489,9 +1496,10 @@
                     }
                     m.textarea.css('height', newAreaHeight + 'px');
                     m.container.css('height', newBarHeight + 'px');
+                    var onBottom = (m.pageContent[0].scrollTop === m.pageContent[0].scrollHeight - m.pageContent[0].offsetHeight);
                     if (m.pageContent.length > 0) {
                         m.pageContent.css('padding-bottom', newBarHeight + 'px');
-                        if (m.pageContent.find('.messages-new-first').length === 0) {
+                        if (m.pageContent.find('.messages-new-first').length === 0 && onBottom) {
                             m.pageContent.scrollTop(m.pageContent[0].scrollHeight - m.pageContent[0].offsetHeight);
                         }
                     }
@@ -2123,7 +2131,7 @@
                 var t7_ctx, t7_template;
                 if (typeof content === 'string') {
                     if (url) {
-                        if (app.template7Cache[url]) t7_template = t7.cache[url];
+                        if (app.template7Cache[url] && !options.ignoreCache) t7_template = t7.cache[url];
                         else {
                             t7_template = t7.compile(content);
                             t7.cache[url] = t7_template;
@@ -3121,8 +3129,8 @@
                 var textHTML = params.text ? '<div class="modal-text">' + params.text + '</div>' : '';
                 var afterTextHTML = params.afterText ? params.afterText : '';
                 var noButtons = !params.buttons || params.buttons.length === 0 ? 'modal-no-buttons' : '';
-                var verticalButtons = params.verticalButtons ? 'modal-buttons-vertical' : '';
-                modalHTML = '<div class="modal ' + noButtons + ' ' + (params.cssClass || '') + '"><div class="modal-inner">' + (titleHTML + textHTML + afterTextHTML) + '</div><div class="modal-buttons ' + verticalButtons + '">' + buttonsHTML + '</div></div>';
+                var verticalButtons = params.verticalButtons ? 'modal-buttons-vertical': '';
+                modalHTML = '<div class="modal ' + noButtons + ' ' + (params.cssClass || '') + '"><div class="modal-inner">' + (titleHTML + textHTML + afterTextHTML) + '</div><div class="modal-buttons modal-buttons-' + params.buttons.length + ' ' + verticalButtons + '">' + buttonsHTML + '</div></div>';
             }
         
             _modalTemplateTempDiv.innerHTML = modalHTML;
@@ -4002,11 +4010,13 @@
                         }
                         else {
                             var target = effect === 'reveal' ? views : panel;
+                            panel.trigger('close');
                             $('body').addClass('panel-closing');
                             target.transitionEnd(function () {
-                                app.allowPanelOpen = true;
+                                panel.trigger('closed');
                                 panel.css({display: ''});
                                 $('body').removeClass('panel-closing');
+                                app.allowPanelOpen = true;
                             });
                         }
                     }
@@ -4108,6 +4118,9 @@
                 lazyLoadImages = pageContainer.find('.lazy');
                 lazyLoadImages.each(function(index, el) {
                     el = $(el);
+                    if (el.parents('.tab:not(.active)').length > 0) {
+                        return;
+                    }
                     if (isElementInViewport(el[0])) {
                         loadImage(el);
                     }
@@ -4128,6 +4141,7 @@
             function attachEvents(destroy) {
                 var method = destroy ? 'off' : 'on';
                 lazyLoadImages[method]('lazy', lazyHandler);
+                lazyLoadImages.parents('.tab')[method]('show', lazyHandler);
                 pageContainer[method]('lazy', lazyHandler);
                 pageContent[method]('lazy', lazyHandler);
                 pageContent[method]('scroll', lazyHandler);
@@ -5019,7 +5033,6 @@
             var option, optionHasMedia, optionImage, optionIcon, optionGroup, optionGroupLabel, optionPreviousGroup, optionIsLabel, previousGroup, optionColor, optionClassName, optionData;
             for (var i = 0; i < select.length; i++) {
                 option = $(select[i]);
-                if (option[0].disabled) continue;
                 optionData = option.dataset();
                 optionImage = optionData.optionImage || $selectData.optionImage;
                 optionIcon = optionData.optionIcon || $selectData.optionIcon;
@@ -5027,6 +5040,7 @@
                 if (material) optionHasMedia = optionImage || optionIcon;
                 optionColor = optionData.optionColor;
                 optionClassName = optionData.optionClass;
+                if (option[0].disabled) optionClassName += ' disabled';
                 optionGroup = option.parent('optgroup')[0];
                 optionGroupLabel = optionGroup && optionGroup.label;
                 optionIsLabel = false;
@@ -5761,6 +5775,13 @@
                     else return;
                 }
                 
+                /*jshint validthis:true */
+                container = $(this);
+        
+                if (container.hasClass('refreshing')) {
+                    return;
+                }
+                
                 isMoved = false;
                 isTouched = true;
                 isScrolling = undefined;
@@ -5769,8 +5790,7 @@
                 touchesStart.x = e.type === 'touchstart' ? e.targetTouches[0].pageX : e.pageX;
                 touchesStart.y = e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY;
                 touchStartTime = (new Date()).getTime();
-                /*jshint validthis:true */
-                container = $(this);
+                
             }
             
             function handleTouchMove(e) {
@@ -6108,12 +6128,14 @@
         app.initPageMaterialTabbar = function (pageContainer) {
             pageContainer = $(pageContainer);
             var tabbar = $(pageContainer).find('.tabbar');
-            if (tabbar.find('.tab-link-highlight').length === 0) {
+        
+            if (tabbar.length > 0 && tabbar.find('.tab-link-highlight').length === 0) {
                 tabbar.find('.toolbar-inner').append('<span class="tab-link-highlight"></span>');
                 var tabLinkWidth = 1 / tabbar.find('.tab-link').length * 100;
+                var highlightTranslate = (app.rtl ? - tabbar.find('.tab-link.active').index(): tabbar.find('.tab-link.active').index()) * 100;
                 tabbar.find('.tab-link-highlight')
                     .css({width: tabLinkWidth + '%'})
-                    .transform('translate3d(' + tabbar.find('.tab-link.active').index() * 100 + '%,0,0)');
+                    .transform('translate3d(' + highlightTranslate + '%,0,0)');
             }
         };
 
@@ -6141,7 +6163,8 @@
             // Animated tabs
             var isAnimatedTabs = tabs.parent().hasClass('tabs-animated-wrap');
             if (isAnimatedTabs) {
-                tabs.transform('translate3d(' + -newTab.index() * 100 + '%,0,0)');
+                var tabTranslate = (app.rtl ? newTab.index() : -newTab.index()) * 100;
+                tabs.transform('translate3d(' + tabTranslate + '%,0,0)');
             }
         
             // Remove active class from old tabs
@@ -6201,9 +6224,10 @@
                             var clientLeft = tabbar[0].clientLeft;
                         }
                         var tabLinkWidth = 1 / tabbar.find('.tab-link').length * 100;
+                        var highlightTranslate = (app.rtl ? - tabLink.index() : tabLink.index()) * 100;
                         tabbar.find('.tab-link-highlight')
                             .css({width: tabLinkWidth + '%'})
-                            .transform('translate3d(' + tabLink.index() * 100 + '%,0,0)');
+                            .transform('translate3d(' + highlightTranslate + '%,0,0)');
                     }
                 }
             }
@@ -6411,10 +6435,17 @@
                 var needsRipple = app.params.materialRippleElements;
                 var $el = $(el);
                 if ($el.is(needsRipple)) {
+                    if ($el.hasClass('no-ripple')) {
+                        return false;
+                    }
                     return $el;
                 }
                 else if ($el.parents(needsRipple).length > 0) {
-                    return $el.parents(needsRipple).eq(0);
+                    var rippleParent = $el.parents(needsRipple).eq(0);
+                    if (rippleParent.hasClass('no-ripple')) {
+                        return false;
+                    }
+                    return rippleParent;
                 }
                 else return false;
             }
@@ -6605,6 +6636,10 @@
                 }
         
                 if (document.activeElement === e.target) {
+                    if (app.params.activeState) removeActive();
+                    if (app.params.material && app.params.materialRipple) {
+                        rippleTouchEnd();
+                    }
                     return true;
                 }
         
@@ -6750,6 +6785,12 @@
                     document.addEventListener('mouseup', handleMouseUp);
                 }
             }
+            if (app.params.material && app.params.materialRipple) {
+                document.addEventListener('contextmenu', function (e) {
+                    if (activableElement) removeActive();
+                    rippleTouchEnd();
+                });
+            }
                 
         };
         
@@ -6824,8 +6865,8 @@
                 
                 // Check if link is external 
                 if (isLink) {
-                    if (clicked.is(app.params.externalLinks) || url.indexOf('javascript:') >= 0) {
-                        if(clicked.attr('target') === '_system') {
+                    if (clicked.is(app.params.externalLinks) || (url && url.indexOf('javascript:') >= 0)) {
+                        if(url && clicked.attr('target') === '_system') {
                             e.preventDefault();
                             window.open(url, '_system');
                         }
@@ -7159,7 +7200,7 @@
                 var tag = this.nodeName.toLowerCase();
                 if (skipTypes.indexOf(type) >= 0) return;
                 if (skipNames.indexOf(name) >= 0 || !name) return;
-                if (tag === 'select' && input.attr('multiple')) {
+                if (tag === 'select' && input.prop('multiple')) {
                     skipNames.push(name);
                     formData[name] = [];
                     form.find('select[name="' + name + '"] option').each(function () {
@@ -7208,7 +7249,7 @@
                 if (!formData[name]) return;
                 if (skipTypes.indexOf(type) >= 0) return;
                 if (skipNames.indexOf(name) >= 0 || !name) return;
-                if (tag === 'select' && input.attr('multiple')) {
+                if (tag === 'select' && input.prop('multiple')) {
                     skipNames.push(name);
                     form.find('select[name="' + name + '"] option').each(function () {
                         if (formData[name].indexOf(this.value) >= 0) this.selected = true;
@@ -7356,15 +7397,19 @@
             pageContainer = $(pageContainer);
             var textareas = pageContainer.find('textarea.resizable');
             pageContainer.find('.item-input').each(function () {
-                var i = $(this);
+                var itemInput = $(this);
                 var notInputs = ['checkbox', 'button', 'submit', 'range', 'radio', 'image'];
-                i.find('input, select, textarea').each(function () {
-                    if (notInputs.indexOf($(this).attr('type')) < 0) {
-                        i.addClass('item-input-field');
+                itemInput.find('input, select, textarea').each(function () {
+                    var input = $(this);
+                    if (notInputs.indexOf(input.attr('type')) < 0) {
+                        itemInput.addClass('item-input-field');
+                        if (input.val().trim() !== '') {
+                            input.parents('.item-input, .input-field').add(input.parents('.item-inner')).addClass('not-empty-state');
+                        }
                     }
                 });
-                if (i.parents('.input-item, .inputs-list').length > 0) return;
-                i.parents('.list-block').eq(0).addClass('inputs-list');
+                if (itemInput.parents('.input-item, .inputs-list').length > 0) return;
+                itemInput.parents('.list-block').eq(0).addClass('inputs-list');
             });
         };
         /*======================================================
@@ -8179,6 +8224,7 @@
                 momentumRatio: 7,
                 freeMode: false,
                 // Common settings
+                closeByOutsideClick: true,
                 scrollToInput: true,
                 inputReadOnly: true,
                 convertToPopover: true,
@@ -8362,12 +8408,11 @@
                     if (activeIndex >= col.items.length) activeIndex = col.items.length - 1;
                     var previousActiveIndex = col.activeIndex;
                     col.activeIndex = activeIndex;
-                    col.wrapper.find('.picker-selected, .picker-after-selected, .picker-before-selected').removeClass('picker-selected picker-after-selected picker-before-selected');
+                    col.wrapper.find('.picker-selected').removeClass('picker-selected');
         
                     col.items.transition(transition);
+                    
                     var selectedItem = col.items.eq(activeIndex).addClass('picker-selected').transform('');
-                    var prevItems = selectedItem.prevAll().addClass('picker-before-selected');
-                    var nextItems = selectedItem.nextAll().addClass('picker-after-selected');
                         
                     // Set 3D rotate effect
                     if (p.params.rotateEffect) {
@@ -8653,7 +8698,7 @@
                     
             }
             
-            if (!p.inline) $('html').on('click', closeOnHTMLClick);
+            if (!p.inline && p.params.closeByOutsideClick) $('html').on('click', closeOnHTMLClick);
         
             // Open
             function onPickerClose() {
@@ -8803,6 +8848,7 @@
                     '</div>',
                 weekHeader: true,
                 // Common settings
+                closeByOutsideClick: true,
                 scrollToInput: true,
                 inputReadOnly: true,
                 convertToPopover: true,
@@ -9153,6 +9199,7 @@
                         var col = j;
                         dayIndex ++;
                         var dayNumber = dayIndex - firstDayOfMonthIndex;
+                        var weekDayIndex = (col - 1 + p.params.firstDay > 6) ? (col - 1 - 7 + p.params.firstDay) : (col - 1 + p.params.firstDay);
                         var addClass = '';
                         if (dayNumber < 0) {
                             dayNumber = daysInPrevMonth + dayNumber + 1;
@@ -9175,7 +9222,7 @@
                         // Selected
                         if (currentValues.indexOf(dayDate) >= 0) addClass += ' picker-calendar-day-selected';
                         // Weekend
-                        if (p.params.weekendDays.indexOf(col - 1) >= 0) {
+                        if (p.params.weekendDays.indexOf(weekDayIndex) >= 0) {
                             addClass += ' picker-calendar-day-weekend';
                         }
                         // Disabled
@@ -9516,7 +9563,7 @@
                     
             }
             
-            if (!p.inline) $('html').on('click', closeOnHTMLClick);
+            if (!p.inline && p.params.closeByOutsideClick) $('html').on('click', closeOnHTMLClick);
         
             // Open
             function onPickerClose() {
@@ -9851,7 +9898,7 @@
             return prevent;
         };
         // Preprocess content by plugin
-        app.pluginProcess = function (action, data) {
+        app.pluginProcess = function (process, data) {
             var processed = data;
             for (var i = 0; i < _plugins.length; i++) {
                 if (_plugins[i].preprocess && process in _plugins[i].preprocess) {
@@ -10081,10 +10128,16 @@
                 if (typeof value === 'undefined') {
                     // Get value
                     if (this[0]) {
-                        var dataKey = this[0].getAttribute('data-' + key);
-                        if (dataKey) return dataKey;
-                        else if (this[0].dom7ElementDataStorage && (key in this[0].dom7ElementDataStorage)) return this[0].dom7ElementDataStorage[key];
-                        else return undefined;
+                        if (this[0].dom7ElementDataStorage && (key in this[0].dom7ElementDataStorage)) {
+                            return this[0].dom7ElementDataStorage[key];
+                        }
+                        else {
+                            var dataKey = this[0].getAttribute('data-' + key);    
+                            if (dataKey) {
+                                return dataKey;
+                            }
+                            else return undefined;
+                        }
                     }
                     else return undefined;
                 }
@@ -10229,9 +10282,9 @@
             once: function (eventName, targetSelector, listener, capture) {
                 var dom = this;
                 if (typeof targetSelector === 'function') {
-                    targetSelector = false;
                     listener = arguments[1];
                     capture = arguments[2];
+                    targetSelector = false;
                 }
                 function proxy(e) {
                     listener(e);
@@ -10520,6 +10573,10 @@
                 }
                 return this;
             },
+            appendTo: function (parent) {
+                $(parent).append(this);
+                return this;
+            },
             prepend: function (newChild) {
                 var i, j;
                 for (i = 0; i < this.length; i++) {
@@ -10540,6 +10597,10 @@
                         this[i].insertBefore(newChild, this[i].childNodes[0]);
                     }
                 }
+                return this;
+            },
+            prependTo: function (parent) {
+                $(parent).prepend(this);
                 return this;
             },
             insertBefore: function (selector) {
@@ -10704,9 +10765,9 @@
             var shortcuts = ('click blur focus focusin focusout keyup keydown keypress submit change mousedown mousemove mouseup mouseenter mouseleave mouseout mouseover touchstart touchend touchmove resize scroll').split(' ');
             var notTrigger = ('resize scroll').split(' ');
             function createMethod(name) {
-                Dom7.prototype[name] = function (handler) {
+                Dom7.prototype[name] = function (targetSelector, listener, capture) {
                     var i;
-                    if (typeof handler === 'undefined') {
+                    if (typeof targetSelector === 'undefined') {
                         for (i = 0; i < this.length; i++) {
                             if (notTrigger.indexOf(name) < 0) {
                                 if (name in this[i]) this[i][name]();
@@ -10718,7 +10779,7 @@
                         return this;
                     }
                     else {
-                        return this.on(name, handler);
+                        return this.on(name, targetSelector, listener, capture);
                     }
                 };
             }
@@ -10804,7 +10865,10 @@
                     // Should be key=value object
                     stringData = $.serializeObject(options.data);
                 }
-                options.url += paramsPrefix + stringData;
+                if (stringData.length) {
+                    options.url += paramsPrefix + stringData;
+                    if (paramsPrefix === '?') paramsPrefix = '&';
+                }
             }
             // JSONP
             if (options.dataType === 'json' && options.url.indexOf('callback=') >= 0) {
@@ -10945,7 +11009,8 @@
                         }
                     }
                     else {
-                        fireAjaxCallback('ajaxSuccess', {xhr: xhr}, 'success', xhr.responseText, xhr.status, xhr);
+                        responseData = xhr.responseType === 'text' || xhr.responseType === '' ? xhr.responseText : xhr.response;
+                        fireAjaxCallback('ajaxSuccess', {xhr: xhr}, 'success', responseData, xhr.status, xhr);
                     }
                 }
                 else {
@@ -11852,6 +11917,9 @@
             // autoplay
             autoplay: false,
             autoplayDisableOnInteraction: true,
+            // To support iOS's swipe-to-go-back gesture (when being used in-app, with UIWebView).
+            iOSEdgeSwipeDetection: false,
+            iOSEdgeSwipeThreshold: 20,
             // Free mode
             freeMode: false,
             freeModeMomentum: true,
@@ -11892,6 +11960,7 @@
             mousewheelReleaseOnEdges: false,
             mousewheelInvert: false,
             mousewheelForceToAxis: false,
+            mousewheelSensitivity: 1,
             // Hash Navigation
             hashnav: false,
             // Slides grid
@@ -12534,8 +12603,8 @@
             if (s.slides.length === 0) return;
             if (typeof s.slides[0].swiperSlideOffset === 'undefined') s.updateSlidesOffset();
         
-            var offsetCenter = s.params.centeredSlides ? -translate + s.size / 2 : -translate;
-            if (s.rtl) offsetCenter = s.params.centeredSlides ? translate - s.size / 2 : translate;
+            var offsetCenter = -translate;
+            if (s.rtl) offsetCenter = translate;
         
             // Visible Slides
             var containerBox = s.container[0].getBoundingClientRect();
@@ -12544,10 +12613,9 @@
             s.slides.removeClass(s.params.slideVisibleClass);
             for (var i = 0; i < s.slides.length; i++) {
                 var slide = s.slides[i];
-                var slideCenterOffset = (s.params.centeredSlides === true) ? slide.swiperSlideSize / 2 : 0;
-                var slideProgress = (offsetCenter - slide.swiperSlideOffset - slideCenterOffset) / (slide.swiperSlideSize + s.params.spaceBetween);
+                var slideProgress = (offsetCenter - slide.swiperSlideOffset) / (slide.swiperSlideSize + s.params.spaceBetween);
                 if (s.params.watchSlidesVisibility) {
-                    var slideBefore = -(offsetCenter - slide.swiperSlideOffset - slideCenterOffset);
+                    var slideBefore = -(offsetCenter - slide.swiperSlideOffset);
                     var slideAfter = slideBefore + s.slidesSizesGrid[i];
                     var isVisible =
                         (slideBefore >= 0 && slideBefore < s.size) ||
@@ -13000,12 +13068,21 @@
             if (s.params.swipeHandler) {
                 if (!findElementInEvent(e, s.params.swipeHandler)) return;
             }
+        
+            var startX = s.touches.currentX = e.type === 'touchstart' ? e.targetTouches[0].pageX : e.pageX;
+            var startY = s.touches.currentY = e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY;
+            
+            // Do NOT start if iOS edge swipe is detected. Otherwise iOS app (UIWebView) cannot swipe-to-go-back anymore
+            if(s.device.ios && s.params.iOSEdgeSwipeDetection && startX <= s.params.iOSEdgeSwipeThreshold) {
+                return;
+            }
+        
             isTouched = true;
             isMoved = false;
             isScrolling = undefined;
             startMoving = undefined;
-            s.touches.startX = s.touches.currentX = e.type === 'touchstart' ? e.targetTouches[0].pageX : e.pageX;
-            s.touches.startY = s.touches.currentY = e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY;
+            s.touches.startX = startX;
+            s.touches.startY = startY;
             touchStartTime = Date.now();
             s.allowClick = true;
             s.updateContainerSize();
@@ -13443,14 +13520,6 @@
             if (s.snapIndex >= s.snapGrid.length) s.snapIndex = s.snapGrid.length - 1;
         
             var translate = - s.snapGrid[s.snapIndex];
-            
-            // Directions locks
-            if (!s.params.allowSwipeToNext && translate < s.translate && translate < s.minTranslate()) {
-                return false;
-            }
-            if (!s.params.allowSwipeToPrev && translate > s.translate && translate > s.maxTranslate()) {
-                return false;
-            }
         
             // Stop autoplay
             if (s.params.autoplay && s.autoplaying) {
@@ -13470,6 +13539,16 @@
                     slideIndex = i;
                 }
             }
+        
+            // Directions locks
+            if (!s.params.allowSwipeToNext && translate < s.translate && translate < s.minTranslate()) {
+                return false;
+            }
+            if (!s.params.allowSwipeToPrev && translate > s.translate && translate > s.maxTranslate()) {
+                if ((s.activeIndex || 0) !== slideIndex ) return false;
+            }
+        
+            // Update Index
             if (typeof speed === 'undefined') speed = s.params.speed;
             s.previousIndex = s.activeIndex || 0;
             s.activeIndex = slideIndex;
@@ -13713,6 +13792,9 @@
             s.wrapper.children('.' + s.params.slideClass + '.' + s.params.slideDuplicateClass).remove();
         
             var slides = s.wrapper.children('.' + s.params.slideClass);
+        
+            if(s.params.slidesPerView === 'auto' && !s.params.loopedSlides) s.params.loopedSlides = slides.length;
+        
             s.loopedSlides = parseInt(s.params.loopedSlides || s.params.slidesPerView, 10);
             s.loopedSlides = s.loopedSlides + s.params.loopAdditionalSlides;
             if (s.loopedSlides > slides.length) {

@@ -12,8 +12,9 @@
  * 
  * Licensed under MIT
  * 
- * Released on: July 18, 2015
+ * Released on: September 11, 2015
  */
+
 html,
 body {
   position: relative;
@@ -2374,9 +2375,6 @@ html.pixel-ratio-3 .list-block li:last-child li .item-inner:after {
   transform: scaleY(0.33);
 }
 /* === Contacts === */
-.contacts-content {
-  background: #fff;
-}
 .contacts-block {
   margin: 0;
 }
@@ -2531,7 +2529,6 @@ html.pixel-ratio-3 .list-block li:last-child li .item-inner:after {
   transform: scale(1.33333333) translateY(21px);
   color: rgba(0, 0, 0, 0.35);
   width: auto;
-  float: left;
 }
 .list-block .input-item .floating-label ~ .item-input input::-webkit-input-placeholder,
 .list-block.inputs-list .floating-label ~ .item-input input::-webkit-input-placeholder {
@@ -2539,6 +2536,7 @@ html.pixel-ratio-3 .list-block li:last-child li .item-inner:after {
 }
 .list-block .focus-state .floating-label,
 .list-block .not-empty-state .floating-label {
+  color: rgba(0, 0, 0, 0.65);
   -webkit-transform: scale(1) translateY(0);
   transform: scale(1) translateY(0);
 }
@@ -2788,6 +2786,12 @@ html:not(.watch-active-state) .button-raised:active,
   background-size: 100% 2px;
   background-repeat: no-repeat;
   outline: 0;
+  -ms-background-position-y: 500px;
+}
+.range-slider input[type="range"]:focus,
+.range-slider input[type="range"]:active {
+  border: 0;
+  outline: 0 none;
 }
 .range-slider input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -2795,6 +2799,7 @@ html:not(.watch-active-state) .button-raised:active,
   -ms-appearance: none;
   appearance: none;
   border: none;
+  outline: 0;
   height: 20px;
   width: 20px;
   position: relative;
@@ -2811,6 +2816,53 @@ html:not(.watch-active-state) .button-raised:active,
   z-index: 1;
   background: #2196f3;
   content: ' ';
+}
+.range-slider input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 2px;
+  background: #b7b8b7;
+  border: none;
+  outline: 0;
+}
+.range-slider input[type="range"]::-moz-range-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  border: none;
+  outline: 0;
+  height: 20px;
+  width: 20px;
+  position: relative;
+  background: #2196f3;
+  border-radius: 20px;
+}
+.range-slider input[type="range"]::-ms-track {
+  width: 100%;
+  height: 2px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+.range-slider input[type="range"]::-ms-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  border: none;
+  outline: 0;
+  height: 20px;
+  width: 20px;
+  position: relative;
+  background: #2196f3;
+  border-radius: 20px;
+}
+.range-slider input[type="range"]::-ms-fill-lower {
+  background: #2196f3;
+}
+.range-slider input[type="range"]::-ms-fill-upper {
+  background: #b7b8b7;
 }
 .item-input .range-slider {
   top: 8px;

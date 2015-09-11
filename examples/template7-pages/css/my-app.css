@@ -27,12 +27,12 @@ a {
   margin-left: 0;
 }
 .panel.panel-right {
-  background: #c34648;
-  border-left: 1px solid rgba(107, 51, 51, 0.65);
+  background: #092238;
+  border-right: 1px solid #103553;
 }
 .panel.panel-left {
-  background: #c34648;
-  border-right: 1px solid rgba(107, 51, 51, 0.65);
+  background: #092238;
+  border-right: 1px solid #103553;
 }
 .panel .content-block {
   color: #ffffff;
@@ -94,15 +94,25 @@ a {
   text-shadow: 1px 1px #ffffff;
   text-transform: uppercase;
 }
+blockquote.tagline {
+  font-size: 11px;
+  top: -10px;
+  position: relative;
+  letter-spacing: .52em;
+  color: #efb6b6;
+  text-shadow: 1px 1px #8a2222;
+  font-weight: 100;
+  font-family: Oxygen;
+}
 .page-content .content-block-inner {
   position: relative;
   overflow: hidden;
   line-height: 1.90em;
-  color: rgba(255, 255, 255, 0.41);
+  color: rgba(133, 156, 177, 0.97);
   border-radius: 0;
-  background: rgba(5, 22, 37, 0.8);
-  box-shadow: inset 0 10px 2.5em #000000;
-  text-shadow: 1px 1px #11293e;
+  background: rgba(7, 45, 78, 0.93);
+  box-shadow: inset 0 10px 1em #052038;
+  text-shadow: 1px 1px #062038;
   font-weight: 100;
   font-family: Oxygen;
   padding: 1.35em 2.35em;
@@ -135,15 +145,16 @@ a {
   color: #ffffff;
   border-bottom: 1em solid rgba(183, 40, 40, 0.6);
   border-radius: 0;
-  background: rgba(23, 54, 82, 0.8);
-  box-shadow: inset 0 10px 2.5em #000000;
-  text-shadow: 1px 1px #091927;
+  background: rgba(193, 25, 25, 0.8);
+  box-shadow: inset 0 10px 20px rgba(204, 26, 26, 0.64);
+  text-shadow: 1px 1px #731212;
   text-align: center;
   font-size: 3.5em;
   height: 2.4em;
   padding-top: 1.95em;
   font-weight: 100;
   font-family: Oxygen;
+  border-top: 1px solid #a92424;
 }
 .navbar {
   background: #ebebeb;

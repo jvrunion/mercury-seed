@@ -12,8 +12,9 @@
  * 
  * Licensed under MIT
  * 
- * Released on: July 18, 2015
+ * Released on: September 11, 2015
  */
+
 /*=============
   Framework 7 RTL Additions
 =============*/
@@ -96,6 +97,10 @@ html {
 .navbar .right {
   margin-left: 0;
   margin-right: auto;
+}
+.tabbar .tab-link-highlight {
+  left: auto;
+  right: 0;
 }
 /* === Forms === */
 .list-block input[type="text"],
